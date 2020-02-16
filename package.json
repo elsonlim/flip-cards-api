@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "jest",
     "tsc-w": "tsc -w",
     "nodemon": "nodemon build/index.js",
     "dev": "npx concurrently -r 'npm:tsc-w' 'npm:nodemon'"
@@ -12,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^25.1.2",
     "concurrently": "^5.1.0",
     "jest": "^25.1.0",
     "nodemon": "^2.0.2",
