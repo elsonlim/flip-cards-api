@@ -7,7 +7,8 @@
     "test": "jest",
     "tsc-w": "tsc -w",
     "nodemon": "nodemon build/index.js",
-    "dev": "npx concurrently -r 'npm:tsc-w' 'npm:nodemon'"
+    "dev": "npx concurrently -r 'npm:tsc-w' 'npm:nodemon'",
+    "lint": "tslint -c tslint.json -p tsconfig.json"
   },
   "keywords": [],
   "author": "",
