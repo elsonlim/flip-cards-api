@@ -5,7 +5,8 @@
   "rules": {
     "no-console": {
       "severity": "warning"
-    }
+    },
+    "ordered-imports": false
   },
   "rulesDirectory": ["src/"]
 }

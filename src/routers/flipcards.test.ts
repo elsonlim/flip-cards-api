@@ -4,15 +4,15 @@ import app from "../app";
 
 declare var db: Db;
 
-interface mockData {
-  hiragana?: String;
-  katagana?: String;
-  kanji?: String;
-  english?: String;
+interface MockData {
+  hiragana?: string;
+  katagana?: string;
+  kanji?: string;
+  english?: string;
 }
 
 describe("flipcards", () => {
-  let mockData: mockData;
+  let mockData: MockData;
   beforeEach(() => {
     mockData = {
       hiragana: "さくじつ",
@@ -21,7 +21,7 @@ describe("flipcards", () => {
     };
   });
 
-  const insertData = (data: mockData): request.Request => {
+  const insertData = (data: MockData): request.Request => {
     return request(app)
       .post("/flipcards/new")
       .set("Content-Type", "application/json")
