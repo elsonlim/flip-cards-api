@@ -10,10 +10,12 @@ router.get("/all", async (req, res) => {
 });
 
 router.post("/new", async (req, res) => {
+  const { hiragana, katagana, english, kanji } = req.body;
   const card = new FlipCard({
-    hiragana: "さくじつ",
-    katagana: "昨日",
-    english: "yesterday",
+    hiragana,
+    katagana,
+    kanji,
+    english,
   });
 
   await card.save();
