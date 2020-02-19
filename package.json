@@ -7,19 +7,25 @@
     "test": "jest",
     "tsc-w": "tsc -w",
     "nodemon": "nodemon build/index.js",
-    "dev": "npx concurrently -r 'npm:tsc-w' 'npm:nodemon'",
-    "lint": "tslint -c tslint.json -p tsconfig.json"
+    "start": "npx concurrently -r 'npm:tsc-w' 'npm:nodemon'",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "tc": "jest --coverage"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/express": "^4.17.2",
     "@types/jest": "^25.1.2",
+    "@types/supertest": "^2.0.8",
     "concurrently": "^5.1.0",
     "jest": "^25.1.0",
     "nodemon": "^2.0.2",
     "supertest": "^4.0.2",
     "ts-jest": "^25.2.0",
     "typescript": "^3.7.5"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
   }
 }
