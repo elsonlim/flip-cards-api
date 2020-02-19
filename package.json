@@ -25,6 +25,7 @@
     "nodemon": "^2.0.2",
     "supertest": "^4.0.2",
     "ts-jest": "^25.2.0",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.7.5"
   },
   "dependencies": {

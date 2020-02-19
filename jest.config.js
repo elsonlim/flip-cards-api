@@ -10,7 +10,12 @@ module.exports = {
     "^.+\\.(ts|tsx)$": "ts-jest",
   },
   testEnvironment: "node",
-  collectCoverageFrom: ["**/src/**", "!src/index.ts"],
+  collectCoverageFrom: [
+    "**/src/**",
+    "!src/index.ts",
+    "!src/testDbSetup.ts",
+    "!src/utils/db.ts",
+  ],
   testMatch: ["**/src/**/*.test.js", "**/src/**/*.test.ts"],
   coverageThreshold: {
     global: {
@@ -20,5 +25,5 @@ module.exports = {
       statements: 85,
     },
   },
-  setupFilesAfterEnv: ["./dbSetup.ts"],
+  setupFilesAfterEnv: ["./src/testDbSetup.ts"],
 };

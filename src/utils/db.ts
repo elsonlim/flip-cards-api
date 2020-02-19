@@ -3,7 +3,6 @@ import logger from "./logger";
 
 const mongoOptions = { useNewUrlParser: true, useUnifiedTopology: true };
 
-/* istanbul ignore next */
 if (!process.env.MONGO_URL) {
   throw new Error("no mongo url");
 }

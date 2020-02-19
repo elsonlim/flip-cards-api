@@ -1,7 +1,7 @@
 import { MongoClient, Db } from "mongodb";
 import mongoose from "mongoose";
 
-let connection;
+let connection: any;
 declare var global: { db: Db };
 
 beforeAll(async () => {
