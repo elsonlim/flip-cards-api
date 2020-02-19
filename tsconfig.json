@@ -12,7 +12,7 @@
   },
   "include": [
     "src/**/*",
-    "dbSetup.js"
+    "dbSetup.ts"
   ] /* file to be included for typescript */,
   "exclude": ["**/__tests__/**/*", "**/reports/**/*"] /* file to be exclude */
 }

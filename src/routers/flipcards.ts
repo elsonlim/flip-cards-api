@@ -3,10 +3,16 @@ import FlipCard from "../models/FlipCard.model";
 
 const router = express.Router();
 
-router.get("/all", async (req, res) => {
+router.get("/", async (req, res) => {
   const flipcards = await FlipCard.find();
 
   res.json(flipcards);
+});
+
+router.delete("/:id", async (req, res) => {
+  const card = await FlipCard.findByIdAndRemove(req.params.id);
+
+  res.json(card);
 });
 
 router.post("/new", async (req, res) => {
