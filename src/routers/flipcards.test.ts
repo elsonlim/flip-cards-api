@@ -43,7 +43,6 @@ describe("flipcards", () => {
     await insertData(mockData);
 
     const response = await request(app).get("/flipcards");
-    console.log(response);
     expect(response.body).toHaveLength(2);
   });
 

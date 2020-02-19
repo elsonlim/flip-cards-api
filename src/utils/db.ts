@@ -1,14 +1,18 @@
 import mongoose from "mongoose";
 import logger from "./logger";
 
-const mongoOptions = { useNewUrlParser: true, useUnifiedTopology: true };
+const mongoOptions = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+};
 
 if (!process.env.MONGO_URL) {
   throw new Error("no mongo url");
 }
 
 const url = process.env.MONGO_URL;
-logger.debug("DB_URL:" + url);
 mongoose.connect(url, mongoOptions);
 
 const db = mongoose.connection;
