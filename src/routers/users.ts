@@ -16,12 +16,13 @@ router.post("/login", async (req, res) => {
   const { username, password } = req.body;
   const user = await User.findOne({ username });
 
-  const isPasswordCorrect = !!user && (await user.comparePassword(password));
-
-  if (user && isPasswordCorrect) {
-    return res.json({
-      username: user.username,
-    });
+  if (user) {
+    const isPasswordCorrect = await user.comparePassword(password);
+    if (isPasswordCorrect) {
+      return res.json({
+        jwt: await user.generateJWT(),
+      });
+    }
   }
 
   return res.sendStatus(401);

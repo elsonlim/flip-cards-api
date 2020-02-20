@@ -1,14 +1,19 @@
 import mongoose, { Document } from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 const SALT_FACTOR = 12;
 
 export interface IUser {
   username: string;
   password: string;
-  comparePassword: (password: string) => boolean;
 }
 
-export interface IUserDocument extends Document, IUser {}
+export interface IUserMethods {
+  comparePassword: (password: string) => boolean;
+  generateJWT: () => string;
+}
+
+export interface IUserDocument extends Document, IUser, IUserMethods {}
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -31,6 +36,19 @@ userSchema.pre<IUserDocument>("save", async function(next) {
 
 userSchema.methods.comparePassword = async function(candidatePassword: string) {
   return await bcrypt.compare(candidatePassword, this.password);
+};
+userSchema.methods.generateJWT = async function() {
+  const token = await jwt.sign(
+    {
+      name: this.username,
+      iat: Math.floor(Date.now() / 1000),
+    },
+    process.env.JWT_PW as string,
+    {
+      expiresIn: "10m",
+    },
+  );
+  return token;
 };
 
 export default mongoose.model<IUserDocument>("User", userSchema);

@@ -51,7 +51,7 @@ describe("User", () => {
           password: "apple",
         });
 
-      expect(response.body).toMatchObject({ username: "bob" });
+      expect(response.body).toMatchObject({ jwt: expect.any(String) });
     });
 
     it("should not be able to login if username does not exist", async () => {

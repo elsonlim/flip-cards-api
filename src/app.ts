@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import "./utils/db";
 import flipcardsRouter from "./routers/flipcards";
@@ -14,5 +16,16 @@ app.use("/users", usersRouter);
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
+
+app.use(
+  (
+    err: Error,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    res.sendStatus(500);
+  },
+);
 
 export default app;
