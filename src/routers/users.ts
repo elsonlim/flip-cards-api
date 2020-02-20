@@ -12,6 +12,21 @@ router.post("/", async (req, res) => {
   res.status(201).json({ username });
 });
 
+router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  const user = await User.findOne({ username });
+
+  const isPasswordCorrect = !!user && (await user.comparePassword(password));
+
+  if (user && isPasswordCorrect) {
+    return res.json({
+      username: user.username,
+    });
+  }
+
+  return res.sendStatus(401);
+});
+
 router.patch("/:username", async (req, res, next) => {
   const username = req.params.username;
   const password = req.body.password;

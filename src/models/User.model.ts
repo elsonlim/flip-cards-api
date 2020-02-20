@@ -5,6 +5,7 @@ const SALT_FACTOR = 12;
 export interface IUser {
   username: string;
   password: string;
+  comparePassword: (password: string) => boolean;
 }
 
 export interface IUserDocument extends Document, IUser {}
@@ -27,4 +28,9 @@ userSchema.pre<IUserDocument>("save", async function(next) {
   }
   next();
 });
+
+userSchema.methods.comparePassword = async function(candidatePassword: string) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
 export default mongoose.model<IUserDocument>("User", userSchema);

@@ -29,14 +29,67 @@ describe("User", () => {
     });
   });
 
-  describe("PATCH /users/:username", () => {
-    let user: any;
+  describe("POST /users/login", () => {
+    let user: IUser;
     let Users: Collection;
 
     beforeEach(async () => {
       await createUser({ username: "bob", password: "apple" });
       Users = db.collection("users");
-      user = await Users.findOne({ username: "bob" });
+      const newUser = await Users.findOne({ username: "bob" });
+      if (newUser) {
+        user = newUser;
+      }
+    });
+
+    it("should login user", async () => {
+      const response = await request(app)
+        .post("/users/login")
+        .set("Content-Type", "application/json")
+        .send({
+          username: "bob",
+          password: "apple",
+        });
+
+      expect(response.body).toMatchObject({ username: "bob" });
+    });
+
+    it("should not be able to login if username does not exist", async () => {
+      const response = await request(app)
+        .post("/users/login")
+        .set("Content-Type", "application/json")
+        .send({
+          username: "bob1",
+          password: "apple",
+        });
+
+      expect(response.status).toBe(401);
+    });
+
+    it("should not be able to login if password is wrong", async () => {
+      const response = await request(app)
+        .post("/users/login")
+        .set("Content-Type", "application/json")
+        .send({
+          username: "bob",
+          password: "apple1",
+        });
+
+      expect(response.status).toBe(401);
+    });
+  });
+
+  describe("PATCH /users/:username", () => {
+    let user: IUser;
+    let Users: Collection;
+
+    beforeEach(async () => {
+      await createUser({ username: "bob", password: "apple" });
+      Users = db.collection("users");
+      const newUser = await Users.findOne({ username: "bob" });
+      if (newUser) {
+        user = newUser;
+      }
     });
 
     it("should not change password if no password field is supply", async () => {
