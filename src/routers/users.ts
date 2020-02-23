@@ -1,7 +1,12 @@
-import express, { NextFunction, Request, Response } from "express";
+import express from "express";
 import User from "../models/User.model";
-import { setCookie, getCookie } from "../utils/cookieHelper";
-import jwt from "jsonwebtoken";
+import { setCookie } from "../utils/cookieHelper";
+import {
+  verifiedJwt,
+  verifiedXsrf,
+  IRequestWithUser,
+} from "../handlers/authHandlers";
+
 import crypto from "crypto";
 
 const router = express.Router();
@@ -36,44 +41,10 @@ router.post("/login", async (req, res) => {
   return res.sendStatus(401);
 });
 
-interface RequestWithUser extends Request {
-  user: string | object;
-}
-
-export const verifiedJwt = (
-  req: RequestWithUser,
-  res: Response,
-  next: NextFunction,
-) => {
-  const token = getCookie(req, "auth");
-
-  const userInfo = jwt.verify(token, process.env.JWT_PW as string, {
-    ignoreExpiration: false,
-  });
-
-  req.user = userInfo;
-  next();
-};
-
-export const verifiedXsrf = (
-  req: RequestWithUser,
-  res: Response,
-  next: NextFunction,
-) => {
-  const cookieXSRF = getCookie(req, "XSRF-TOKEN");
-  const headerXSRF = req.header("X-XSRF-TOKEN");
-
-  if (!cookieXSRF || cookieXSRF !== headerXSRF) {
-    return res.sendStatus(401);
-  }
-
-  next();
-};
-
 router.patch(
   "/:username",
-  (req, res, next) => verifiedJwt(req as RequestWithUser, res, next),
-  (req, res, next) => verifiedXsrf(req as RequestWithUser, res, next),
+  (req, res, next) => verifiedJwt(req as IRequestWithUser, res, next),
+  (req, res, next) => verifiedXsrf(req as IRequestWithUser, res, next),
   async (req, res) => {
     const username = req.params.username;
     const password = req.body.password;
