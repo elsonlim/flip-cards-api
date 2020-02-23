@@ -13,6 +13,11 @@ export interface IUserMethods {
   generateJWT: () => string;
 }
 
+export interface IJwtPayload {
+  name: string;
+  iat: number;
+}
+
 export interface IUserDocument extends Document, IUser, IUserMethods {}
 
 const userSchema = new mongoose.Schema({
@@ -37,17 +42,16 @@ userSchema.pre<IUserDocument>("save", async function(next) {
 userSchema.methods.comparePassword = async function(candidatePassword: string) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
+
 userSchema.methods.generateJWT = async function() {
-  const token = await jwt.sign(
-    {
-      name: this.username,
-      iat: Math.floor(Date.now() / 1000),
-    },
-    process.env.JWT_PW as string,
-    {
-      expiresIn: "10m",
-    },
-  );
+  const payload: IJwtPayload = {
+    name: this.username,
+    iat: Math.floor(Date.now() / 1000),
+  };
+
+  const token = await jwt.sign(payload, process.env.JWT_PW as string, {
+    expiresIn: "10m",
+  });
   return token;
 };
 

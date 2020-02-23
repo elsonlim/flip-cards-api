@@ -1,5 +1,9 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import User from "../models/User.model";
+import { setCookie, getCookie } from "../utils/cookieHelper";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+
 const router = express.Router();
 
 router.post("/", async (req, res) => {
@@ -19,8 +23,12 @@ router.post("/login", async (req, res) => {
   if (user) {
     const isPasswordCorrect = await user.comparePassword(password);
     if (isPasswordCorrect) {
+      const token = await user.generateJWT();
+      const xsrfToken = crypto.randomBytes(32).toString("hex");
+      setCookie(res, "auth", token);
+      setCookie(res, "XSRF-TOKEN", xsrfToken);
       return res.json({
-        jwt: await user.generateJWT(),
+        xsrfToken,
       });
     }
   }
@@ -28,25 +36,63 @@ router.post("/login", async (req, res) => {
   return res.sendStatus(401);
 });
 
-router.patch("/:username", async (req, res, next) => {
-  const username = req.params.username;
-  const password = req.body.password;
+interface RequestWithUser extends Request {
+  user: string | object;
+}
 
-  const user = await User.findOne({
-    username,
+export const verifiedJwt = (
+  req: RequestWithUser,
+  res: Response,
+  next: NextFunction,
+) => {
+  const token = getCookie(req, "auth");
+
+  const userInfo = jwt.verify(token, process.env.JWT_PW as string, {
+    ignoreExpiration: false,
   });
 
-  if (!user) {
-    return res.sendStatus(403);
+  req.user = userInfo;
+  next();
+};
+
+export const verifiedXsrf = (
+  req: RequestWithUser,
+  res: Response,
+  next: NextFunction,
+) => {
+  const cookieXSRF = getCookie(req, "XSRF-TOKEN");
+  const headerXSRF = req.header("X-XSRF-TOKEN");
+
+  if (!cookieXSRF || cookieXSRF !== headerXSRF) {
+    return res.sendStatus(401);
   }
 
-  if (password) {
-    user.password = password;
-  }
+  next();
+};
 
-  await user.save();
+router.patch(
+  "/:username",
+  (req, res, next) => verifiedJwt(req as RequestWithUser, res, next),
+  (req, res, next) => verifiedXsrf(req as RequestWithUser, res, next),
+  async (req, res) => {
+    const username = req.params.username;
+    const password = req.body.password;
 
-  res.sendStatus(200);
-});
+    const user = await User.findOne({
+      username,
+    });
+
+    if (!user) {
+      return res.sendStatus(403);
+    }
+
+    if (password) {
+      user.password = password;
+    }
+
+    await user.save();
+    return res.sendStatus(200);
+  },
+);
 
 export default router;

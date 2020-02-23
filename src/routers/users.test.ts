@@ -1,5 +1,5 @@
 import { Db, Collection } from "mongodb";
-import request, { Request } from "supertest";
+import request, { Request, Response } from "supertest";
 import app from "../app";
 import { IUser } from "../models/User.model";
 
@@ -32,6 +32,7 @@ describe("User", () => {
   describe("POST /users/login", () => {
     let user: IUser;
     let Users: Collection;
+    const agent = request.agent(app);
 
     beforeEach(async () => {
       await createUser({ username: "bob", password: "apple" });
@@ -43,7 +44,7 @@ describe("User", () => {
     });
 
     it("should login user", async () => {
-      const response = await request(app)
+      const response = await agent
         .post("/users/login")
         .set("Content-Type", "application/json")
         .send({
@@ -51,7 +52,11 @@ describe("User", () => {
           password: "apple",
         });
 
-      expect(response.body).toMatchObject({ jwt: expect.any(String) });
+      expect(response.body).toMatchObject({ xsrfToken: expect.any(String) });
+      const authCookie = response.get("set-cookie")[0];
+      const xsrfCookie = response.get("set-cookie")[1];
+      expect(authCookie).toEqual(expect.stringContaining("auth="));
+      expect(xsrfCookie).toEqual(expect.stringContaining("XSRF-TOKEN="));
     });
 
     it("should not be able to login if username does not exist", async () => {
@@ -74,43 +79,64 @@ describe("User", () => {
           username: "bob",
           password: "apple1",
         });
-
       expect(response.status).toBe(401);
     });
   });
 
   describe("PATCH /users/:username", () => {
+    const agent = request.agent(app);
     let user: IUser;
     let Users: Collection;
+    let xsrfToken: string;
+    let patchUser: (username: string, payload: object) => Promise<Response>;
 
     beforeEach(async () => {
-      await createUser({ username: "bob", password: "apple" });
+      await agent
+        .post("/users")
+        .set("Content-Type", "application/json")
+        .send({ username: "bob", password: "password" });
+
       Users = db.collection("users");
       const newUser = await Users.findOne({ username: "bob" });
       if (newUser) {
         user = newUser;
       }
+
+      const res = await agent
+        .post("/users/login")
+        .set("Content-Type", "application/json")
+        .send({ username: "bob", password: "password" });
+
+      xsrfToken = res.body.xsrfToken;
+      patchUser = async (username, body) =>
+        await agent
+          .patch(`/users/${username}`)
+          .set("Content-Type", "application/json")
+          .set("X-XSRF-TOKEN", xsrfToken)
+          .send(body);
     });
 
-    it("should not change password if no password field is supply", async () => {
+    it("should return 401 if wrong xsrf token is passed in", async () => {
+      const res = await agent
+        .patch(`/users/bob`)
+        .set("Content-Type", "application/json");
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should not change password if no password field is supplied", async () => {
       const originalPassword = user.password;
-      await request(app)
-        .patch("/users/bob")
-        .set("Content-Type", "application/json")
-        .send({});
+      await patchUser("bob", {});
 
       const updatedUser = await Users.findOne({ username: "bob" });
       expect(originalPassword).toBe(updatedUser.password);
     });
 
-    it("should change password", async () => {
+    it("should change password when editing password", async () => {
       const originalPassword = user.password;
-      await request(app)
-        .patch("/users/bob")
-        .set("Content-Type", "application/json")
-        .send({
-          password: "orange",
-        });
+      await patchUser("bob", {
+        password: "orange",
+      });
 
       const updatedUser = await Users.findOne({ username: "bob" });
       expect(originalPassword).not.toBe(updatedUser.password);
@@ -120,12 +146,9 @@ describe("User", () => {
     });
 
     it("should return 403 if user does not exist", async () => {
-      const res = await request(app)
-        .patch("/users/alice")
-        .set("Content-Type", "application/json")
-        .send({
-          password: "orange",
-        });
+      const res = await patchUser("alice", {
+        password: "orange",
+      });
 
       expect(res.status).toBe(403);
     });
