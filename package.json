@@ -8,7 +8,7 @@
     "tsc-w": "tsc -w",
     "nodemon": "nodemon build/index.js",
     "start": "npx concurrently -r 'npm:tsc-w' 'npm:nodemon'",
-    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "lint": "eslint -c .eslintrc.js --ext .ts src",
     "tc": "jest --runInBand --coverage"
   },
   "keywords": [],
@@ -24,13 +24,18 @@
     "@types/morgan": "^1.7.37",
     "@types/supertest": "^2.0.8",
     "@types/uuid": "^3.4.7",
+    "@typescript-eslint/eslint-plugin": "^2.20.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^2.20.0",
+    "@typescript-eslint/parser": "^2.20.0",
     "concurrently": "^5.1.0",
+    "eslint": "^6.8.0",
     "jest": "^25.1.0",
     "nodemon": "^2.0.2",
     "supertest": "^4.0.2",
     "ts-jest": "^25.2.0",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.7.5"
+    "tslint": "^6.0.0",
+    "typescript": "^3.7.5",
+    "typescript-eslint": "0.0.1-alpha.0"
   },
   "dependencies": {
     "@types/dotenv": "^8.2.0",

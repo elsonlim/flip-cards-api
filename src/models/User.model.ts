@@ -3,22 +3,22 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const SALT_FACTOR = 12;
 
-export interface IUser {
+export interface User {
   username: string;
   password: string;
 }
 
-export interface IUserMethods {
-  comparePassword: (password: string) => boolean;
+export interface UserMethods {
+  comparePassword: (password: string) => Promise<boolean>;
   generateJWT: () => string;
 }
 
-export interface IJwtPayload {
+export interface JwtPayload {
   name: string;
   iat: number;
 }
 
-export interface IUserDocument extends Document, IUser, IUserMethods {}
+export interface UserDocument extends Document, User, UserMethods {}
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
 });
 
-userSchema.pre<IUserDocument>("save", async function(next) {
+userSchema.pre<UserDocument>("save", async function(next) {
   if (this.isModified("password")) {
     const salt = await bcrypt.genSalt(SALT_FACTOR);
     const hash = await bcrypt.hash(this.password, salt);
@@ -39,20 +39,22 @@ userSchema.pre<IUserDocument>("save", async function(next) {
   next();
 });
 
-userSchema.methods.comparePassword = async function(candidatePassword: string) {
+userSchema.methods.comparePassword = async function(
+  candidatePassword: string,
+): Promise<boolean> {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-userSchema.methods.generateJWT = async function() {
-  const payload: IJwtPayload = {
+userSchema.methods.generateJWT = function(): string {
+  const payload: JwtPayload = {
     name: this.username,
     iat: Math.floor(Date.now() / 1000),
   };
 
-  const token = await jwt.sign(payload, process.env.JWT_PW as string, {
+  const token = jwt.sign(payload, process.env.JWT_PW as string, {
     expiresIn: "10m",
   });
   return token;
 };
 
-export default mongoose.model<IUserDocument>("User", userSchema);
+export default mongoose.model<UserDocument>("User", userSchema);

@@ -1,12 +1,12 @@
 import { Db, Collection } from "mongodb";
 import request, { Request, Response } from "supertest";
 import app from "../app";
-import { IUser } from "../models/User.model";
+import { User } from "../models/User.model";
 
-declare var db: Db;
+declare const db: Db;
 
 describe("User", () => {
-  const createUser = (user: IUser): Request => {
+  const createUser = (user: User): Request => {
     return request(app)
       .post("/users")
       .set("Content-Type", "application/json")
@@ -30,17 +30,13 @@ describe("User", () => {
   });
 
   describe("POST /users/login", () => {
-    let user: IUser;
     let Users: Collection;
     const agent = request.agent(app);
 
     beforeEach(async () => {
       await createUser({ username: "bob", password: "apple" });
       Users = db.collection("users");
-      const newUser = await Users.findOne({ username: "bob" });
-      if (newUser) {
-        user = newUser;
-      }
+      await Users.findOne({ username: "bob" });
     });
 
     it("should login user", async () => {
@@ -85,7 +81,7 @@ describe("User", () => {
 
   describe("PATCH /users/:username", () => {
     const agent = request.agent(app);
-    let user: IUser;
+    let user: User;
     let Users: Collection;
     let xsrfToken: string;
     let patchUser: (username: string, payload: object) => Promise<Response>;

@@ -4,7 +4,7 @@ import { setCookie } from "../utils/cookieHelper";
 import {
   verifiedJwt,
   verifiedXsrf,
-  IRequestWithUser,
+  RequestWithUser,
 } from "../handlers/authHandlers";
 
 import crypto from "crypto";
@@ -28,7 +28,7 @@ router.post("/login", async (req, res) => {
   if (user) {
     const isPasswordCorrect = await user.comparePassword(password);
     if (isPasswordCorrect) {
-      const token = await user.generateJWT();
+      const token = user.generateJWT();
       const xsrfToken = crypto.randomBytes(32).toString("hex");
       setCookie(res, "auth", token);
       setCookie(res, "XSRF-TOKEN", xsrfToken);
@@ -43,8 +43,8 @@ router.post("/login", async (req, res) => {
 
 router.patch(
   "/:username",
-  (req, res, next) => verifiedJwt(req as IRequestWithUser, res, next),
-  (req, res, next) => verifiedXsrf(req as IRequestWithUser, res, next),
+  (req, res, next) => verifiedJwt(req as RequestWithUser, res, next),
+  (req, res, next) => verifiedXsrf(req as RequestWithUser, res, next),
   async (req, res) => {
     const username = req.params.username;
     const password = req.body.password;

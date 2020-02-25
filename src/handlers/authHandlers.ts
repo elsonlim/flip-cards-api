@@ -2,12 +2,12 @@ import { NextFunction, Request, Response } from "express";
 import { getCookie } from "../utils/cookieHelper";
 import jwt from "jsonwebtoken";
 
-export interface IRequestWithUser extends Request {
+export interface RequestWithUser extends Request {
   user: string | object;
 }
 
 export const verifiedJwt = (
-  req: IRequestWithUser,
+  req: RequestWithUser,
   res: Response,
   next: NextFunction,
 ) => {
@@ -22,7 +22,7 @@ export const verifiedJwt = (
 };
 
 export const verifiedXsrf = (
-  req: IRequestWithUser,
+  req: RequestWithUser,
   res: Response,
   next: NextFunction,
 ) => {

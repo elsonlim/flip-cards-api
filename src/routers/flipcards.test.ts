@@ -2,7 +2,7 @@ import { Db } from "mongodb";
 import request from "supertest";
 import app from "../app";
 
-declare var db: Db;
+declare const db: Db;
 
 interface MockData {
   hiragana?: string;
