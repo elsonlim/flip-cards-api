@@ -13,7 +13,7 @@ const app = express();
 app.use(
   cors({
     credentials: true,
-    origin: ["chrome-search://local-ntp"],
+    origin: ["chrome-search://local-ntp", "http://localhost:3000"],
   }),
 );
 app.use(express.json());
