@@ -26,6 +26,7 @@ const flipcardSchema = new mongoose.Schema({
   hiragana: String,
   furigana: [],
   english: String,
+  kanji: String,
 });
 
 export default mongoose.model("FlipCard", flipcardSchema);

@@ -16,7 +16,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.post("/new", async (req, res, next) => {
-  const { index, tags, text, hiragana, furigana, english } = req.body;
+  const { index, tags, text, hiragana, furigana, english, kanji } = req.body;
   const card = new FlipCard({
     index,
     tags,
@@ -24,6 +24,7 @@ router.post("/new", async (req, res, next) => {
     hiragana,
     furigana,
     english,
+    kanji
   });
 
   try {
