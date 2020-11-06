@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --runInBand --watchAll",
     "tsc-w": "tsc -w",
-    "tsc": "tsc",
+    "build": "tsc",
     "nodemon": "nodemon build/index.js",
     "start": "npm run tsc && npx concurrently -r 'npm:tsc-w' 'npm:nodemon'",
     "lint": "eslint -c .eslintrc.js --ext .ts src",

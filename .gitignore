@@ -1,9 +1,14 @@
-node_modules/
+# dependencies
+/node_modules
 
-build/
-
+# testing
 coverage/
 
-.vscode/
+# production
+build/
 
+
+# misc
 .env
+.vscode/
+globalConfig.json

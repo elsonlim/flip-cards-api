@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+    commands:
+      - echo "installing"
+      - npm install
+  pre_build:
+    commands:
+      - echo "running test"
+      - npm run testc
+  build:
+    commands:
+      - echo "building artifacts"
+      - npm run build
+  post_build:
+    commands:
+      - echo "post build... not doing anything here"
+artifacts:
+  files:
+    - "**/*"
+  discard-paths: no
+  base-directory: build
