@@ -4,6 +4,10 @@ os: linux
 #   - source: /
 #     destination: /var/www/html/WordPress
 hooks:
+  ApplicationStop:
+    - location: scripts/stop_server.sh
+      timeout: 300
+      runas: root
   BeforeInstall:
     - location: scripts/install_dependencies.sh
       timeout: 300
@@ -15,8 +19,4 @@ hooks:
   ApplicationStart:
 		- location: scripts/start_server.sh
 			timeout: 300
-      runas: root
-  ApplicationStop:
-    - location: scripts/stop_server.sh
-      timeout: 300
       runas: root
